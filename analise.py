@@ -2,13 +2,15 @@ import pandas as pd
 
 df_preventiva = pd.read_excel('PREVENTIVA.xlsx')
 df_carreta = pd.read_excel('CARRETA.xlsx')
-df_carreta.columns = df_carreta.columns.str.strip()
 df_Esl = pd.read_excel('ESL.xlsx')
 df_mobile = pd.read_excel('MOBILE.xlsx')
 df_bipe = pd.read_excel('BIPE.xlsx')
 df_bipe_de_notas = pd.read_excel("BIPE DE NOTAS.xlsx")
-df_bipe_de_notas.columns = df_bipe_de_notas.columns.str.strip()
 
+df_lista = [ df_preventiva, df_carreta, df_Esl, df_mobile , df_bipe , df_bipe_de_notas]
+
+for i in df_lista: 
+    i.columns = i.columns.str.strip()
 
 df_merge = pd.merge(df_preventiva, df_carreta[['PEDIDO','NF`s','CHAVE','PREVISÃO ENTREGA', 'TIPO']], left_on='PEDIDO 1P/FULL', right_on='PEDIDO', how='left').drop(columns=['PEDIDO'])
 
