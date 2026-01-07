@@ -1,12 +1,12 @@
 import pandas as pd
 
 
-df_preventiva = pd.read_excel('PREVENTIVA.xlsx')
+df_preventiva = pd.read_excel('Preventiva_07-01-2026.xlsx')
 df_carreta = pd.read_excel('CARRETA.xlsx')
-df_esl = pd.read_excel('ESL.xlsx')
-df_mobile = pd.read_excel('MOBILE.xlsx')
-df_bipe = pd.read_excel('BIPE.xlsx')
-df_bipe_notas = pd.read_excel('BIPE DE NOTAS.xlsx')
+df_esl = pd.read_excel('magazine_2026_01_07_09_40.xlsx')
+df_mobile = pd.read_excel('Mobile_07-01-2026.xls')
+df_bipe = pd.read_excel('Bipe_Produtos_07-01-2026.xlsx')
+df_bipe_notas = pd.read_excel('Bipe_de_notas_07-01-2026.xlsx', sheet_name='Plan1')
 
 
 dfs = [
