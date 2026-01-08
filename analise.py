@@ -2,12 +2,12 @@ import pandas as pd
 from datetime import datetime
 
 
-df_preventiva = pd.read_excel('Preventiva_07-01-2026.xlsx')
+df_preventiva = pd.read_excel('Preventiva_08-01-2026.xlsx')
 df_carreta = pd.read_excel('CARRETA.xlsx')
-df_esl = pd.read_excel('magazine_2026_01_07_09_40.xlsx')
-df_mobile = pd.read_excel('Mobile_07-01-2026.xls')
-df_bipe = pd.read_excel('Bipe_Produtos_07-01-2026.xlsx')
-df_bipe_notas = pd.read_excel('Bipe_de_notas_07-01-2026.xlsx', sheet_name='Plan1')
+df_esl = pd.read_excel('magazine_2026_01_08_08_38.xlsx')
+df_mobile = pd.read_excel('Mobile_08-01-2026.xls')
+df_bipe = pd.read_excel('Bipe_Produtos_08-01-2026.xlsx')
+df_bipe_notas = pd.read_excel('Bipe_de_notas_08-01-2026.xlsx', sheet_name='Plan1')
 
 
 dfs = [
@@ -21,7 +21,7 @@ for df in dfs:
 df_final = (
     df_preventiva
         .merge(
-            df_carreta[['PEDIDO', 'NF`s', 'CHAVE', 'PREVISÃO ENTREGA', 'TIPO']],
+            df_carreta[['PEDIDO', 'NF`s', 'CHAVE', 'DATA ENTRADA', 'Tipo_Fluxo']],
             left_on='PEDIDO 1P/FULL',
             right_on='PEDIDO',
             how='left'
@@ -50,15 +50,15 @@ df_final = (
         .drop(columns=['Nota Fiscal/Chave NF-e'])
 
         .merge(
-            df_bipe[['PEDIDO', 'INFO']],
+            df_bipe[['PEDIDO_BIPE', 'BIPE_PRODUTO']],
             left_on='PEDIDO 1P/FULL',
-            right_on='PEDIDO',
+            right_on='PEDIDO_BIPE',
             how='left'
         )
-        .drop(columns=['PEDIDO'])
+        .drop(columns=['PEDIDO_BIPE'])
 
         .merge(
-            df_bipe_notas[['NF', 'OCORRENCIA']],
+            df_bipe_notas[['NF', 'BIPE_DE_NOTAS']],
             left_on='NF`s',
             right_on='NF',
             how='left'
@@ -90,7 +90,7 @@ for col in colunas_datas:
 
 
 data_hoje = datetime.today().strftime('%d-%m-%Y')
-nome_arquivo = f'{datetime}.xlsx'
+nome_arquivo = f'{data_hoje}.xlsx'
 
 with pd.ExcelWriter(
     nome_arquivo,
