@@ -1,13 +1,29 @@
 import pandas as pd
 from datetime import datetime
+import os
+
+caminho_script = os.path.abspath('__file__')
+diretorio_raiz = os.path.dirname(caminho_script)
+caminho_dados = os.path.join(diretorio_raiz, 'dados')
 
 
-df_preventiva = pd.read_excel('Preventiva_08-01-2026.xlsx')
-df_carreta = pd.read_excel('CARRETA.xlsx')
-df_esl = pd.read_excel('magazine_2026_01_08_08_38.xlsx')
-df_mobile = pd.read_excel('Mobile_08-01-2026.xls')
-df_bipe = pd.read_excel('Bipe_Produtos_08-01-2026.xlsx')
-df_bipe_notas = pd.read_excel('Bipe_de_notas_08-01-2026.xlsx', sheet_name='Plan1')
+
+for arquivo in os.listdir(caminho_dados):
+    caminho_arquivo = os.path.join(caminho_dados, arquivo)
+
+    if 'Preventiva' in arquivo:
+        df_preventiva = pd.read_excel(caminho_arquivo)
+    elif 'CARRETA' in arquivo:
+        df_carreta = pd.read_excel(caminho_arquivo)
+    elif 'magazine' in arquivo:
+        df_esl = pd.read_excel(caminho_arquivo)
+    elif 'Mobile' in arquivo:
+        df_mobile = pd.read_excel(caminho_arquivo)
+    elif 'Bipe_Produtos' in arquivo:
+        df_bipe = pd.read_excel(caminho_arquivo)
+    elif 'Bipe_de_notas' in arquivo:
+        df_bipe_notas = pd.read_excel(caminho_arquivo, sheet_name='Plan1')
+        
 
 
 dfs = [
@@ -21,7 +37,7 @@ for df in dfs:
 df_final = (
     df_preventiva
         .merge(
-            df_carreta[['PEDIDO', 'NF`s', 'CHAVE', 'DATA ENTRADA', 'Tipo_Fluxo']],
+            df_carreta[['PEDIDO', 'NF`s', 'CHAVE', 'PREVISÃO ENTREGA', 'TIPO']],
             left_on='PEDIDO 1P/FULL',
             right_on='PEDIDO',
             how='left'
