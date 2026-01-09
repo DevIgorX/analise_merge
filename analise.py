@@ -37,7 +37,7 @@ for df in dfs:
 df_final = (
     df_preventiva
         .merge(
-            df_carreta[['PEDIDO', 'NF`s', 'CHAVE', 'PREVISÃO ENTREGA', 'TIPO']],
+            df_carreta[['PEDIDO', 'NF`s', 'CHAVE', 'DATA ENTRADA', 'TIPO_FLUXO']],
             left_on='PEDIDO 1P/FULL',
             right_on='PEDIDO',
             how='left'
@@ -74,7 +74,7 @@ df_final = (
         .drop(columns=['PEDIDO_BIPE'])
 
         .merge(
-            df_bipe_notas[['NF', 'BIPE_DE_NOTAS']],
+            df_bipe_notas[['NF', 'BIPE_NOTAS']],
             left_on='NF`s',
             right_on='NF',
             how='left'
@@ -97,7 +97,7 @@ filtro = df_final_3['Última ocorrência/Observações'] == 'Não informado'
 df_final_3.loc[filtro, 'Última ocorrência/Observações'] = df_final_3.loc[filtro, 'Ocorrência/Ocorrência']
 
 colunas_datas = [
-    'PREVISÃO ENTREGA',
+    'DATA ENTRADA',
     'Última ocorrência/Data ocorrência'
 ]
 
