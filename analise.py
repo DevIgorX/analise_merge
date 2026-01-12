@@ -2,7 +2,7 @@ import pandas as pd
 from datetime import datetime
 import os
 
-caminho_script = os.path.abspath('__file__')
+caminho_script = os.path.abspath(__file__)
 diretorio_raiz = os.path.dirname(caminho_script)
 caminho_dados = os.path.join(diretorio_raiz, 'dados')
 
@@ -13,96 +13,121 @@ for arquivo in os.listdir(caminho_dados):
 
     if 'Preventiva' in arquivo:
         df_preventiva = pd.read_excel(caminho_arquivo)
+        df_preventiva.columns = df_preventiva.columns.str.strip().str.upper()
+        df_preventiva = df_preventiva.add_prefix('PREVENTIVA_')
     elif 'CARRETA' in arquivo:
         df_carreta = pd.read_excel(caminho_arquivo)
+        df_carreta.columns = df_carreta.columns.str.strip().str.upper()
+        df_carreta = df_carreta.add_prefix('CARRETA_')
     elif 'magazine' in arquivo:
         df_esl = pd.read_excel(caminho_arquivo)
+        df_esl.columns = df_esl.columns.str.strip().str.upper()
+        df_esl = df_esl.add_prefix('ESL_')
     elif 'Mobile' in arquivo:
         df_mobile = pd.read_excel(caminho_arquivo)
+        df_mobile.columns = df_mobile.columns.str.strip().str.upper()
+        df_mobile = df_mobile.add_prefix('MOBILE_')
     elif 'Bipe_Produtos' in arquivo:
         df_bipe = pd.read_excel(caminho_arquivo)
+        df_bipe.columns = df_bipe.columns.str.strip().str.upper()
+        df_bipe = df_bipe.add_prefix('BIPE_PROD_')
     elif 'Bipe_de_notas' in arquivo:
         df_bipe_notas = pd.read_excel(caminho_arquivo, sheet_name='Plan1')
+        df_bipe_notas.columns = df_bipe_notas.columns.str.strip().str.upper()
+        df_bipe_notas = df_bipe_notas.add_prefix('BIPE_NOTAS_')
         
 
-
-dfs = [
-    df_preventiva, df_carreta, df_esl,
-    df_mobile, df_bipe, df_bipe_notas
-]
-
-for df in dfs:
-    df.columns = df.columns.str.strip()
 
 df_final = (
     df_preventiva
         .merge(
-            df_carreta[['PEDIDO', 'NF`s', 'CHAVE', 'DATA ENTRADA', 'TIPO_FLUXO']],
-            left_on='PEDIDO 1P/FULL',
-            right_on='PEDIDO',
+            df_carreta[['CARRETA_PEDIDO', 'CARRETA_NF`S', 'CARRETA_CHAVE', 'CARRETA_DATA ENTRADA', 'CARRETA_TIPO_FLUXO']],
+            left_on='PREVENTIVA_PEDIDO 1P/FULL',  right_on='CARRETA_PEDIDO',
             how='left'
         )
-        .drop(columns=['PEDIDO'])
+        .drop(columns=['CARRETA_PEDIDO'])
 
         .merge(
-            df_mobile[['Pedido', 'Tipo', 'Entregador']],
-            left_on='PEDIDO 1P/FULL',
-            right_on='Pedido',
+            df_mobile[['MOBILE_PEDIDO', 'MOBILE_TIPO', 'MOBILE_ENTREGADOR']],
+            left_on='PREVENTIVA_PEDIDO 1P/FULL',
+            right_on='MOBILE_PEDIDO',
             how='left'
         )
-        .drop(columns=['Pedido'])
+        .drop(columns=['MOBILE_PEDIDO'])
 
         .merge(
-            df_esl[
-                ['Nota Fiscal/Chave NF-e',
-                 'Última ocorrência/Observações',
-                 'Pessoa/Nome',
-                 'Última ocorrência/Data ocorrência']
-            ],
-            left_on='CHAVE',
-            right_on='Nota Fiscal/Chave NF-e',
+            df_esl[[
+                'ESL_NOTA FISCAL/CHAVE NF-E',
+                'ESL_ÚLTIMA OCORRÊNCIA/OBSERVAÇÕES',
+                'ESL_PESSOA/NOME',
+                'ESL_ÚLTIMA OCORRÊNCIA/DATA OCORRÊNCIA'
+            ]],
+            left_on='CARRETA_CHAVE',
+            right_on='ESL_NOTA FISCAL/CHAVE NF-E',
             how='left'
         )
-        .drop(columns=['Nota Fiscal/Chave NF-e'])
+        .drop(columns=['ESL_NOTA FISCAL/CHAVE NF-E'])
 
         .merge(
-            df_bipe[['PEDIDO_BIPE', 'BIPE_PRODUTO']],
-            left_on='PEDIDO 1P/FULL',
-            right_on='PEDIDO_BIPE',
+            df_bipe[['BIPE_PROD_PEDIDO_BIPE', 'BIPE_PROD_BIPE_PRODUTO']],
+            left_on='PREVENTIVA_PEDIDO 1P/FULL',
+            right_on='BIPE_PROD_PEDIDO_BIPE',
             how='left'
         )
-        .drop(columns=['PEDIDO_BIPE'])
+        .drop(columns=['BIPE_PROD_PEDIDO_BIPE'])
 
         .merge(
-            df_bipe_notas[['NF', 'BIPE_NOTAS']],
-            left_on='NF`s',
-            right_on='NF',
+            df_bipe_notas[['BIPE_NOTAS_NF', 'BIPE_NOTAS_BIPE_NOTAS']],
+            left_on='CARRETA_NF`S', 
+            right_on='BIPE_NOTAS_NF',
             how='left'
         )
-        .drop(columns=['NF'])
+        .drop(columns=['BIPE_NOTAS_NF'])
 )
 
-df_final_2 = (pd.merge(df_carreta,df_esl[['Nota Fiscal/Chave NF-e', 'Ocorrência/Ocorrência']], left_on='CHAVE', right_on='Nota Fiscal/Chave NF-e', how='left')
-              .drop(columns=['Nota Fiscal/Chave NF-e']))
+
+df_final_2 = (
+    pd.merge(
+        df_carreta,
+        df_esl[['ESL_NOTA FISCAL/CHAVE NF-E', 'ESL_OCORRÊNCIA/OCORRÊNCIA']], 
+        left_on='CARRETA_CHAVE', 
+        right_on='ESL_NOTA FISCAL/CHAVE NF-E', 
+        how='left'
+    )
+    .drop(columns=['ESL_NOTA FISCAL/CHAVE NF-E'])
+)
 
 
-df_final['Última ocorrência/Observações'] = df_final['Última ocorrência/Observações'].fillna('Não informado')
+coluna_obs = 'ESL_ÚLTIMA OCORRÊNCIA/OBSERVAÇÕES'
+coluna_ocorrencia = 'ESL_OCORRÊNCIA/OCORRÊNCIA'
+
+df_final[coluna_obs] = df_final[coluna_obs].fillna('Não informado')
 
 
-df_final_3 = pd.merge(df_final, df_final_2[['CHAVE', 'Ocorrência/Ocorrência']], left_on='CHAVE', right_on='CHAVE', how='left').drop(columns=['CHAVE'])
+df_final_3 = pd.merge(
+    df_final, 
+    df_final_2[['CARRETA_CHAVE', coluna_ocorrencia]], 
+    left_on='CARRETA_CHAVE', 
+    right_on='CARRETA_CHAVE', 
+    how='left'
+).drop(columns=['CARRETA_CHAVE']) 
 
 
-filtro = df_final_3['Última ocorrência/Observações'] == 'Não informado'
+filtro = df_final_3[coluna_obs] == 'Não informado'
+df_final_3.loc[filtro, coluna_obs] = df_final_3.loc[filtro, coluna_ocorrencia]
 
-df_final_3.loc[filtro, 'Última ocorrência/Observações'] = df_final_3.loc[filtro, 'Ocorrência/Ocorrência']
+df_final_3 = df_final_3.drop(columns=['ESL_OCORRÊNCIA/OCORRÊNCIA'])
+
 
 colunas_datas = [
-    'DATA ENTRADA',
-    'Última ocorrência/Data ocorrência'
+    'CARRETA_DATA ENTRADA',
+    'ESL_ÚLTIMA OCORRÊNCIA/DATA OCORRÊNCIA'
 ]
 
 for col in colunas_datas:
-    df_final_3[col] = pd.to_datetime(df_final_3[col], errors='coerce')
+    
+    if col in df_final_3.columns:
+        df_final_3[col] = pd.to_datetime(df_final_3[col], errors='coerce')
 
 
 data_hoje = datetime.today().strftime('%d-%m-%Y')
@@ -114,9 +139,8 @@ with pd.ExcelWriter(
     datetime_format='dd/mm/yyyy'
 ) as writer:
     
-    df_final.to_excel(
+    df_final_3.to_excel( 
         writer,
         sheet_name='Relatorio_diario',
         index=False
     )
-
