@@ -1,6 +1,6 @@
 import pandas as pd
 import os
-diretorio_atual = os.path.abspath('__file__')
+diretorio_atual = os.path.abspath(__file__)
 diretorio_raiz = os.path.dirname(diretorio_atual)
 caminho_dados = os.path.join(diretorio_raiz, 'dados')
 

@@ -69,15 +69,15 @@ df_final = (
         .drop(columns=['ESL_NOTA FISCAL/CHAVE NF-E'])
 
         .merge(
-            df_bipe[['BIPE_PROD_PEDIDO_BIPE', 'BIPE_PROD_BIPE_PRODUTO']],
+            df_bipe[['BIPE_PROD_PEDIDO', 'BIPE_PROD_STATUS']],
             left_on='PREVENTIVA_PEDIDO 1P/FULL',
-            right_on='BIPE_PROD_PEDIDO_BIPE',
+            right_on='BIPE_PROD_PEDIDO',
             how='left'
         )
-        .drop(columns=['BIPE_PROD_PEDIDO_BIPE'])
+        .drop(columns=['BIPE_PROD_PEDIDO'])
 
         .merge(
-            df_bipe_notas[['BIPE_NOTAS_NF', 'BIPE_NOTAS_BIPE_NOTAS']],
+            df_bipe_notas[['BIPE_NOTAS_NF', 'BIPE_NOTAS_OCORRENCIA']],
             left_on='CARRETA_NF`S', 
             right_on='BIPE_NOTAS_NF',
             how='left'
