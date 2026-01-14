@@ -1,17 +1,73 @@
 {% extends "base_templates.html" %}
 
-{% block content%}
+{% block content %}
 
-<form  method="POST" action="{{url_for('rotas.verficar')}}" enctype="multipart/form-data">
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
 
-<div>
- <label>ENVIEI O SEU ARQUIVO</label>
- <input type="file" name="arquivo" accept=".xlsx , .xls" required>
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">📦 Análise de Arquivos de Transporte</h5>
+                </div>
+
+                <div class="card-body">
+                    <p class="text-muted mb-4">
+                        Selecione um ou mais arquivos em Excel para análise e cruzamento dos dados.
+                    </p>
+
+                    <form method="POST" 
+                          action="{{ url_for('rotas.verficar') }}" 
+                          enctype="multipart/form-data">
+
+                        <div class="mb-3">
+                            <label for="arquivos" class="form-label fw-semibold">
+                                Arquivos Excel
+                            </label>
+
+                            <input 
+                                type="file"
+                                class="form-control"
+                                id="arquivos"
+                                name="arquivos"
+                                accept=".xlsx,.xls"
+                                multiple
+                                required
+                            >
+                            <div id="info-arquivos" class="text-muted small mt-2"></div>
+                            <div class="form-text">
+                                Você pode selecionar vários arquivos ao mesmo tempo.
+                            </div>
+                        </div>
+
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary">
+                                🔍 Enviar e Analisar
+                            </button>
+                        </div>
+
+                    </form>
+                </div>
+
+                <div class="card-footer text-muted text-center small">
+                    Sistema de Análise de Entregas • Transportadora
+                </div>
+            </div>
+
+        </div>
+    </div>
 </div>
 
-<button type="submit" >Enviar</button>
-
-</form>
-
-
 {% endblock %}
+
+{% block scripts %}
+<script>
+    const input = document.getElementById('arquivos');
+    const info = document.getElementById('info-arquivos');
+
+    input.addEventListener('change', () => {
+        info.textContent = `${input.files.length} arquivo(s) selecionado(s)`;
+    });
+</script>
+{% endblock %}
+

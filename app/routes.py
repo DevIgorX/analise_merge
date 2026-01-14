@@ -8,20 +8,20 @@ rotas = Blueprint('rotas', __name__)
 def home():
     return render_template('analise_dataframes.html')
 
+from flask import request
+
 @rotas.route('/verificar', methods=['POST'])
 def verficar():
+    arquivos = request.files.getlist('arquivos')
 
-    arquivo = request.files['arquivo']
-
-    if not arquivo or arquivo.filename == '':
-        flash('Nenhum arquivo enviado')
-        return redirect(url_for('rotas.home'))
+    if not arquivos:
+        return "Nenhum arquivo enviado", 400
     
-    upload_path = current_app.config['DIRETORIO_DADOS']
+    pasta_dados = current_app.config['DIRETORIO_DADOS']
 
-    arquivo.save(os.path.join(upload_path, arquivo.filename))
+    for arquivo in arquivos:
+        arquivo.save(os.path.join(pasta_dados, arquivo.filename))
 
-    
-    flash('Arquivo salvo com sucesso!')
+
 
     return redirect(url_for('rotas.home'))
