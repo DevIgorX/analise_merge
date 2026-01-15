@@ -16,24 +16,14 @@
                         Selecione um ou mais arquivos em Excel para análise e cruzamento dos dados.
                     </p>
 
-                    <form method="POST" 
-                          action="{{ url_for('rotas.verficar') }}" 
-                          enctype="multipart/form-data">
+                    <form method="POST" action="{{ url_for('rotas.adicionar_dados') }}" enctype="multipart/form-data">
 
                         <div class="mb-3">
                             <label for="arquivos" class="form-label fw-semibold">
                                 Arquivos Excel
                             </label>
 
-                            <input 
-                                type="file"
-                                class="form-control"
-                                id="arquivos"
-                                name="arquivos"
-                                accept=".xlsx,.xls"
-                                multiple
-                                required
-                            >
+                            <input type="file" class="form-control"id="arquivos" name="arquivos" accept=".xlsx,.xls" multiple required>
                             <div id="info-arquivos" class="text-muted small mt-2"></div>
                             <div class="form-text">
                                 Você pode selecionar vários arquivos ao mesmo tempo.
@@ -42,10 +32,16 @@
 
                         <div class="d-grid">
                             <button type="submit" class="btn btn-primary">
-                                🔍 Enviar e Analisar
+                                Enviar
                             </button>
                         </div>
 
+                    </form>
+
+                    <form method="GET" action="{{ url_for('rotas.analisar_dados') }}" class="mt-3">
+                     <button type="submit" class="btn btn-primary w-100">
+                       🔎 Analisar dados
+                     </button>
                     </form>
                 </div>
 
@@ -60,14 +56,5 @@
 
 {% endblock %}
 
-{% block scripts %}
-<script>
-    const input = document.getElementById('arquivos');
-    const info = document.getElementById('info-arquivos');
 
-    input.addEventListener('change', () => {
-        info.textContent = `${input.files.length} arquivo(s) selecionado(s)`;
-    });
-</script>
-{% endblock %}
 

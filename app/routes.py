@@ -1,9 +1,8 @@
-from flask import Blueprint, render_template, url_for, request, current_app, flash, redirect
+
 import os
 import subprocess
-import json
 import locale
-
+from flask import Blueprint, render_template, url_for, request, current_app, flash, redirect, jsonify
 
 rotas = Blueprint('rotas', __name__)
 
@@ -12,10 +11,9 @@ rotas = Blueprint('rotas', __name__)
 def home():
     return render_template('analise_dataframes.html')
 
-from flask import request
 
-@rotas.route('/verificar', methods=['POST'])
-def verficar():
+@rotas.route('/adicionar_dados', methods=['POST'])
+def adicionar_dados():
     arquivos = request.files.getlist('arquivos')
 
     if not arquivos:
@@ -26,11 +24,18 @@ def verficar():
     for arquivo in arquivos:
         arquivo.save(os.path.join(pasta_dados, arquivo.filename))
 
-    diretorio_raiz = current_app.config['DIRETORIO_RAIZ']
-    caminho_analise = os.path.join(diretorio_raiz, 'analise')
-
-    encoding_padrao = locale.getdefaultlocale(False)
-
-
-
     return redirect(url_for('rotas.home'))
+   
+
+
+@rotas.route('/analisar_dados', methods=['POST', 'GET'])
+def analisar_dados():
+
+    diretorio_raiz = current_app.config['DIRETORIO_RAIZ']
+    caminho_scrip = os.path.join(diretorio_raiz, 'analise.py')
+
+    enconding_padro = locale.getpreferredencoding(False)
+
+    resultado = subprocess.run(['python', caminho_scrip], capture_output=True, text=True, encoding=enconding_padro)
+
+    return jsonify({"mensagem": "deu certo aqui", "resultado": resultado.stdout})
