@@ -2,7 +2,7 @@
 import os
 import subprocess
 import locale
-from flask import Blueprint, render_template, url_for, request, current_app, flash, redirect, jsonify
+from flask import Blueprint, render_template, url_for, request, current_app, flash, redirect, jsonify, json
 
 rotas = Blueprint('rotas', __name__)
 
@@ -38,4 +38,10 @@ def analisar_dados():
 
     resultado = subprocess.run(['python', caminho_scrip], capture_output=True, text=True, encoding=enconding_padro)
 
-    return jsonify({"mensagem": "deu certo aqui", "resultado": resultado.stdout})
+    if resultado.returncode == 0:
+        dados_tabela = json.loads(resultado.stdout)
+        return render_template('tabela_resultado.html', dados=dados_tabela)
+    else:
+        return 'não deu certo aqui'
+
+   
