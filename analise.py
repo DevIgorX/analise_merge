@@ -1,6 +1,7 @@
 import pandas as pd
 from datetime import datetime
 import os
+from utils import formatar_colunas
 
 caminho_script = os.path.abspath(__file__)
 diretorio_raiz = os.path.dirname(caminho_script)
@@ -13,116 +14,122 @@ for arquivo in os.listdir(caminho_dados):
 
     if 'Preventiva' in arquivo:
         df_preventiva = pd.read_excel(caminho_arquivo)
-        df_preventiva.columns = df_preventiva.columns.str.strip().str.upper()
-        df_preventiva = df_preventiva.add_prefix('PREVENTIVA_')
-    elif 'CARRETA' in arquivo:
+        df_preventiva = formatar_colunas(df_preventiva)
+        df_preventiva = df_preventiva.add_prefix('Preventiva_')
+    elif 'Carreta' in arquivo:
         df_carreta = pd.read_excel(caminho_arquivo)
-        df_carreta.columns = df_carreta.columns.str.strip().str.upper()
-        df_carreta = df_carreta.add_prefix('CARRETA_')
+        df_carreta = formatar_colunas(df_carreta)
+        df_carreta = df_carreta.add_prefix('Carreta_')
     elif 'magazine' in arquivo:
         df_esl = pd.read_excel(caminho_arquivo)
-        df_esl.columns = df_esl.columns.str.strip().str.upper()
-        df_esl = df_esl.add_prefix('ESL_')
+        df_esl = formatar_colunas(df_esl)
+        df_esl = df_esl.add_prefix('Esl_')
     elif 'Mobile' in arquivo:
         df_mobile = pd.read_excel(caminho_arquivo)
-        df_mobile.columns = df_mobile.columns.str.strip().str.upper()
-        df_mobile = df_mobile.add_prefix('MOBILE_')
+        df_mobile = formatar_colunas(df_mobile)
+        df_mobile = df_mobile.add_prefix('Mobile_')
     elif 'Bipe_Produtos' in arquivo:
         df_bipe = pd.read_excel(caminho_arquivo)
-        df_bipe.columns = df_bipe.columns.str.strip().str.upper()
-        df_bipe = df_bipe.add_prefix('BIPE_PROD_')
+        df_bipe = formatar_colunas(df_bipe)
+        df_bipe = df_bipe.add_prefix('Bipe_Prod_')
     elif 'Bipe_de_notas' in arquivo:
         df_bipe_notas = pd.read_excel(caminho_arquivo, sheet_name='Plan1')
-        df_bipe_notas.columns = df_bipe_notas.columns.str.strip().str.upper()
-        df_bipe_notas = df_bipe_notas.add_prefix('BIPE_NOTAS_')
+        df_bipe_notas = formatar_colunas(df_bipe_notas)
+        df_bipe_notas = df_bipe_notas.add_prefix('Bipe_Notas_')
         
 
 
 df_final = (
     df_preventiva
         .merge(
-            df_carreta[['CARRETA_PEDIDO', 'CARRETA_NF`S', 'CARRETA_CHAVE', 'CARRETA_DATA ENTRADA', 'CARRETA_TIPO_FLUXO']],
-            left_on='PREVENTIVA_PEDIDO 1P/FULL',  right_on='CARRETA_PEDIDO',
+            df_carreta[['Carreta_Pedido', 'Carreta_Nf`S', 'Carreta_Chave', 'Carreta_Data Entrada', 'Carreta_Tipo_Fluxo']],
+            left_on='Preventiva_Pedido 1P/Full',  right_on='Carreta_Pedido',
             how='left'
         )
-        .drop(columns=['CARRETA_PEDIDO'])
+        .drop(columns=['Carreta_Pedido'])
 
         .merge(
-            df_mobile[['MOBILE_PEDIDO', 'MOBILE_TIPO', 'MOBILE_ENTREGADOR']],
-            left_on='PREVENTIVA_PEDIDO 1P/FULL',
-            right_on='MOBILE_PEDIDO',
+            # Ajuste: Prefixo 'Mobile_' + Title Case
+            df_mobile[['Mobile_Pedido', 'Mobile_Tipo', 'Mobile_Entregador']],
+            left_on='Preventiva_Pedido 1P/Full',
+            right_on='Mobile_Pedido',
             how='left'
         )
-        .drop(columns=['MOBILE_PEDIDO'])
+        .drop(columns=['Mobile_Pedido'])
 
         .merge(
+            # Ajuste: Prefixo 'Esl_' + Title Case (inclusive em siglas como NF-E -> Nf-E)
             df_esl[[
-                'ESL_NOTA FISCAL/CHAVE NF-E',
-                'ESL_ÚLTIMA OCORRÊNCIA/OBSERVAÇÕES',
-                'ESL_PESSOA/NOME',
-                'ESL_ÚLTIMA OCORRÊNCIA/DATA OCORRÊNCIA'
+                'Esl_Nota Fiscal/Chave Nf-E',            # .title() transforma "NF-E" em "Nf-E"
+                'Esl_Última Ocorrência/Observações',
+                'Esl_Pessoa/Nome',
+                'Esl_Última Ocorrência/Data Ocorrência'
             ]],
-            left_on='CARRETA_CHAVE',
-            right_on='ESL_NOTA FISCAL/CHAVE NF-E',
+            left_on='Carreta_Chave',
+            right_on='Esl_Nota Fiscal/Chave Nf-E',
             how='left'
         )
-        .drop(columns=['ESL_NOTA FISCAL/CHAVE NF-E'])
+        .drop(columns=['Esl_Nota Fiscal/Chave Nf-E'])
 
         .merge(
-            df_bipe[['BIPE_PROD_PEDIDO', 'BIPE_PROD_STATUS']],
-            left_on='PREVENTIVA_PEDIDO 1P/FULL',
-            right_on='BIPE_PROD_PEDIDO',
+            # Ajuste: Prefixo 'Bipe_Prod_' + Title Case
+            df_bipe[['Bipe_Prod_Pedido', 'Bipe_Prod_Status_Deposito']],
+            left_on='Preventiva_Pedido 1P/Full',
+            right_on='Bipe_Prod_Pedido',
             how='left'
         )
-        .drop(columns=['BIPE_PROD_PEDIDO'])
+        .drop(columns=['Bipe_Prod_Pedido'])
 
         .merge(
-            df_bipe_notas[['BIPE_NOTAS_NF', 'BIPE_NOTAS_OCORRENCIA']],
-            left_on='CARRETA_NF`S', 
-            right_on='BIPE_NOTAS_NF',
+            # Ajuste: Prefixo 'Bipe_Notas_' + Title Case (NF vira Nf)
+            df_bipe_notas[['Bipe_Notas_Nf', 'Bipe_Notas_Ocorrencia']],
+            left_on='Carreta_Nf`S', 
+            right_on='Bipe_Notas_Nf',
             how='left'
         )
-        .drop(columns=['BIPE_NOTAS_NF'])
+        .drop(columns=['Bipe_Notas_Nf'])
 )
 
-
+# Ajuste do df_final_2 (Correlação Carreta x ESL)
 df_final_2 = (
     pd.merge(
         df_carreta,
-        df_esl[['ESL_NOTA FISCAL/CHAVE NF-E', 'ESL_OCORRÊNCIA/OCORRÊNCIA']], 
-        left_on='CARRETA_CHAVE', 
-        right_on='ESL_NOTA FISCAL/CHAVE NF-E', 
+        df_esl[['Esl_Nota Fiscal/Chave Nf-E', 'Esl_Ocorrência/Ocorrência']], 
+        left_on='Carreta_Chave', 
+        right_on='Esl_Nota Fiscal/Chave Nf-E', 
         how='left'
     )
-    .drop(columns=['ESL_NOTA FISCAL/CHAVE NF-E'])
+    .drop(columns=['Esl_Nota Fiscal/Chave Nf-E'])
 )
 
 
-coluna_obs = 'ESL_ÚLTIMA OCORRÊNCIA/OBSERVAÇÕES'
-coluna_ocorrencia = 'ESL_OCORRÊNCIA/OCORRÊNCIA'
+# Definição das colunas de observação (Title Case)
+coluna_obs = 'Esl_Última Ocorrência/Observações'
+coluna_ocorrencia = 'Esl_Ocorrência/Ocorrência'
 
 df_final[coluna_obs] = df_final[coluna_obs].fillna('Não informado')
 
-
+# Merge final
 df_final_3 = pd.merge(
     df_final, 
-    df_final_2[['CARRETA_CHAVE', coluna_ocorrencia]], 
-    left_on='CARRETA_CHAVE', 
-    right_on='CARRETA_CHAVE', 
+    df_final_2[['Carreta_Chave', coluna_ocorrencia]], 
+    left_on='Carreta_Chave', 
+    right_on='Carreta_Chave', 
     how='left'
-).drop(columns=['CARRETA_CHAVE']) 
+).drop(columns=['Carreta_Chave']) 
 
-
+# Preenchimento condicional
 filtro = df_final_3[coluna_obs] == 'Não informado'
 df_final_3.loc[filtro, coluna_obs] = df_final_3.loc[filtro, coluna_ocorrencia]
 
-df_final_3 = df_final_3.drop(columns=['ESL_OCORRÊNCIA/OCORRÊNCIA'])
+df_final_3 = df_final_3.drop(columns=[coluna_ocorrencia])
 
-
+# Formatação de datas (Nomes atualizados)
 colunas_datas = [
-    'CARRETA_DATA ENTRADA',
-    'ESL_ÚLTIMA OCORRÊNCIA/DATA OCORRÊNCIA'
+    'Carreta_Data Entrada',
+    'Esl_Última Ocorrência/Data Ocorrência'
 ]
+
 
 for col in colunas_datas:
     
