@@ -22,11 +22,11 @@ for arquivo in os.listdir(caminho_dados):
     elif 'Bipe_Produtos' in arquivo:
         df_bipe = pd.read_excel(caminho_arquivo)
         df_bipe = formatar_colunas(df_bipe)
-        df_bipe = df_bipe.add_prefix('Bipe_Prod')
+        df_bipe = df_bipe.add_prefix('Bipe_Prod_')
     elif 'Bipe_de_notas' in arquivo:
         df_bipe_notas = pd.read_excel(caminho_arquivo, sheet_name='Plan1')
         df_bipe_notas = formatar_colunas(df_bipe_notas)
-        df_bipe_notas = df_bipe_notas.add_prefix('Bipe_notas_')
+        df_bipe_notas = df_bipe_notas.add_prefix('Bipe_Notas_')
 
         
 
@@ -55,5 +55,5 @@ filtro = df_final_2['Esl_Última Ocorrência/Observações'] == 'Não informado'
 df_final_2.loc[filtro, 'Esl_Última Ocorrência/Observações'] = df_final_2.loc[filtro, 'Esl_Ocorrência/Ocorrência']
 df_final_2 =  df_final_2.drop(columns=['Esl_Ocorrência/Ocorrência'])
 
-df_final_2.to_excel('Relatorio_Diario', sheet_name='Analise', index=False)
+df_final_2.to_excel('Relatorio_Diario.xlsx', sheet_name='Analise', index=False)
 
