@@ -8,7 +8,7 @@
 <body class="bg-light">
 
 <div class="container mt-5">
-    <h2 class="mb-4">Resultado do Cruzamento (df_final_3)</h2>
+    <h2 class="mb-4">Resultado do Cruzamento dos dados</h2>
     
     <div class="card shadow">
         <div class="card-body">
@@ -16,7 +16,7 @@
                 <table class="table table-striped table-hover table-bordered">
                     <thead class="table-dark">
                         <tr>
-                            {% if dados.Excel and dados.Excel | length > 0 %}
+                            {% if dados.Excel | length > 0 %}
                                 {% for coluna in dados.Excel[0].keys() %}
                                     <th>{{ coluna }}</th>
                                 {% endfor %}

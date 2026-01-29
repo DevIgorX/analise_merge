@@ -40,8 +40,22 @@ def analisar_dados():
 
     if resultado.returncode == 0:
         dados_tabela = json.loads(resultado.stdout)
-        return render_template('tabela_resultado.html', dados=dados_tabela)
+        dados_formatados = {'Excel': dados_tabela}
+        return render_template('tabela_resultado.html', dados=dados_formatados)
     else:
         return 'não deu certo aqui'
 
-   
+
+
+
+@rotas.route('/nova_analise', methods=['GET', 'POST'])
+def deletar_arquivos():
+    pasta_dados = current_app.config['DIRETORIO_DADOS']
+
+    for arquivo in os.listdir(pasta_dados):
+        caminho_arquivo = os.path.join(pasta_dados, arquivo)
+        if arquivo != '.gitkeep':
+            os.remove(caminho_arquivo)
+
+    return redirect(url_for('rotas.home'))
+ 
