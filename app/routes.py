@@ -34,17 +34,35 @@ def analisar_dados():
     diretorio_raiz = current_app.config['DIRETORIO_RAIZ']
     caminho_scrip = os.path.join(diretorio_raiz, 'analise.py')
 
-    enconding_padro = locale.getpreferredencoding(False)
+    enconding_padrao = locale.getpreferredencoding(False)
 
-    resultado = subprocess.run(['python', caminho_scrip], capture_output=True, text=True, encoding=enconding_padro)
+    resultado = subprocess.run(['python', caminho_scrip], capture_output=True, text=True, encoding=enconding_padrao)
 
     if resultado.returncode == 0:
-        dados_tabela = json.loads(resultado.stdout)
-        dados_formatados = {'Excel': dados_tabela}
+        lista_completa = json.loads(resultado.stdout)
+        
+        # Lógica de Paginação
+        itens_por_pagina = 10
+        pagina = request.args.get('pagina', 1, type=int)
+        
+        total_itens = len(lista_completa)
+        total_paginas = (total_itens + itens_por_pagina - 1) // itens_por_pagina
+        
+        # Calculando o início e fim da fatia
+        inicio = (pagina - 1) * itens_por_pagina
+        fim = inicio + itens_por_pagina
+        
+        dados_paginados = lista_completa[inicio:fim]
+        
+        dados_formatados = {
+            "Excel": dados_paginados,
+            "pagina_atual": pagina,
+            "total_paginas": total_paginas
+        }
+        
         return render_template('tabela_resultado.html', dados=dados_formatados)
     else:
-        return 'não deu certo aqui'
-
+        return 'Erro na análise', 500
 
 
 

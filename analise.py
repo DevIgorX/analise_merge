@@ -38,6 +38,7 @@ for arquivo in os.listdir(caminho_dados):
         df_bipe_notas = df_bipe_notas.add_prefix('Bipe_Notas_')
         
 
+df_preventiva = df_preventiva.drop_duplicates(subset='Preventiva_Pedido 1P/Full', keep='first')
 
 df_final = (
     df_preventiva
@@ -134,7 +135,7 @@ colunas_datas = [
 for col in colunas_datas:
     
     if col in df_final_3.columns:
-        df_final_3[col] = pd.to_datetime(df_final_3[col], errors='coerce')
+        df_final_3[col] = pd.to_datetime(df_final_3[col], errors='coerce').dt.strftime('%d/%m/%Y').fillna('Não informado')
 
 
 data_hoje = datetime.today().strftime('%d-%m-%Y')
@@ -153,3 +154,5 @@ with pd.ExcelWriter(
     )
 
 
+resultado_json = df_final_3.to_json(orient='records')
+print(resultado_json)
