@@ -2,68 +2,76 @@
 import os
 import subprocess
 import locale
-from flask import Blueprint, render_template, url_for, request, current_app, flash, redirect, jsonify, json
+from datetime import datetime
+from database import buscar_dados_paginados
+from flask import Blueprint, render_template, url_for, request, current_app, flash, redirect, jsonify, json, send_from_directory
+
 
 rotas = Blueprint('rotas', __name__)
 
 
 @rotas.route('/')
 def home():
-    return render_template('analise_dataframes.html')
+    pasta_dados = current_app.config['DIRETORIO_DADOS']
+    arquivos_no_servidor = [f for f in os.listdir(pasta_dados) if f != '.gitkeep']
+    return render_template('analise_dataframes.html', arquivos_presentes=arquivos_no_servidor)
 
 
 @rotas.route('/adicionar_dados', methods=['POST'])
 def adicionar_dados():
     arquivos = request.files.getlist('arquivos')
-
     if not arquivos:
-        return "Nenhum arquivo enviado", 400
+        flash("Nenhum arquivo enviado!", "danger")
+        return redirect(url_for('rotas.home'))
     
     pasta_dados = current_app.config['DIRETORIO_DADOS']
+    arquivos_pulados = []
 
     for arquivo in arquivos:
-        arquivo.save(os.path.join(pasta_dados, arquivo.filename))
+        caminho_completo = os.path.join(pasta_dados, arquivo.filename)
+        
+        # VERIFICAÇÃO: Se o arquivo já existe, pula e avisa
+        if os.path.exists(caminho_completo):
+            arquivos_pulados.append(arquivo.filename)
+            continue 
+            
+        arquivo.save(caminho_completo)
+
+    if arquivos_pulados:
+        flash(f"Atenção! Os seguintes arquivos já estavam no servidor e foram ignorados: {', '.join(arquivos_pulados)}", "warning")
+    else:
+        flash("Arquivos enviados com sucesso!", "success")
 
     return redirect(url_for('rotas.home'))
-   
 
 
-@rotas.route('/analisar_dados', methods=['POST', 'GET'])
+@rotas.route('/analisar_dados')
 def analisar_dados():
+    pagina = request.args.get('pagina', 1, type=int)
+    processar = request.args.get('processar', 'false') == 'true'
 
-    diretorio_raiz = current_app.config['DIRETORIO_RAIZ']
-    caminho_scrip = os.path.join(diretorio_raiz, 'analise.py')
+    # Só roda o script de análise se o usuário clicou no botão pela primeira vez
+    if processar:
+        diretorio_raiz = current_app.config['DIRETORIO_RAIZ']
+        caminho_script = os.path.join(diretorio_raiz, 'analise.py') # Corrigido o nome
+        enconding_padro = locale.getpreferredencoding(False)
+        
+        # Roda a análise (que agora salva no banco)
+        subprocess.run(['python', caminho_script], capture_output=True, text=True, encoding=enconding_padro)
 
-    enconding_padrao = locale.getpreferredencoding(False)
+    # Busca os dados do banco (seja após o processamento ou apenas mudando de página)
+    itens_por_pg = 7
+    lista_dados, total_itens = buscar_dados_paginados(pagina, itens_por_pg)
+    
+    total_paginas = (total_itens + itens_por_pg - 1) // itens_por_pg
 
-    resultado = subprocess.run(['python', caminho_scrip], capture_output=True, text=True, encoding=enconding_padrao)
+    dados_formatados = {
+        "Excel": lista_dados,
+        "pagina_atual": pagina,
+        "total_paginas": total_paginas
+    }
 
-    if resultado.returncode == 0:
-        lista_completa = json.loads(resultado.stdout)
-        
-        # Lógica de Paginação
-        itens_por_pagina = 10
-        pagina = request.args.get('pagina', 1, type=int)
-        
-        total_itens = len(lista_completa)
-        total_paginas = (total_itens + itens_por_pagina - 1) // itens_por_pagina
-        
-        # Calculando o início e fim da fatia
-        inicio = (pagina - 1) * itens_por_pagina
-        fim = inicio + itens_por_pagina
-        
-        dados_paginados = lista_completa[inicio:fim]
-        
-        dados_formatados = {
-            "Excel": dados_paginados,
-            "pagina_atual": pagina,
-            "total_paginas": total_paginas
-        }
-        
-        return render_template('tabela_resultado.html', dados=dados_formatados)
-    else:
-        return 'Erro na análise', 500
-
+    return render_template('tabela_resultado.html', dados=dados_formatados)
 
 
 @rotas.route('/nova_analise', methods=['GET', 'POST'])
@@ -77,3 +85,14 @@ def deletar_arquivos():
 
     return redirect(url_for('rotas.home'))
  
+
+@rotas.route('/baixar_relatorio')
+def baixar_relatorio():
+    pasta_dados = current_app.config['DIRETORIO_DADOS']
+  
+    data_hoje = datetime.today().strftime('%d-%m-%Y')
+    nome_arquivo = f'Analise_preventiva {data_hoje}.xlsx'
+
+
+    return send_from_directory(pasta_dados, nome_arquivo, as_attachment=True)
+    

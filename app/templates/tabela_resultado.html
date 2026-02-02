@@ -10,7 +10,15 @@
 <body class="bg-light">
 
     <div class="container mt-5">
-        <h2 class="mb-4">Resultado do Cruzamento dos dados</h2>
+        <div class="d-flex align-items-center justify-content-between mb-4">
+            <h2 class="mb-0">Resultado do Cruzamento dos dados</h2>
+
+            <a href="{{ url_for('rotas.baixar_relatorio') }}"
+                class="btn btn-success d-flex align-items-center gap-2 shadow-sm">
+                <i class="bi bi-file-earmark-excel-fill"></i>
+                Exportar Excel
+            </a>
+        </div>
 
         <div class="card shadow">
             <div class="card-body">
@@ -43,28 +51,21 @@
                 <div class="alert alert-warning mt-3">Nenhum dado encontrado no cruzamento.</div>
                 {% endif %}
 
-                <a href="/" class="btn btn-primary mt-3">Voltar</a>
+                <a href="{{url_for('rotas.deletar_arquivos')}}" class="btn btn-primary mt-3">Voltar</a>
 
-                <nav aria-label="Navegação de página" class="mt-4">
+                <nav class="mt-4">
                     <ul class="pagination justify-content-center">
-
-                        {# Botão Anterior #}
                         <li class="page-item {{ 'disabled' if dados.pagina_atual == 1 }}">
                             <a class="page-link"
                                 href="{{ url_for('rotas.analisar_dados', pagina=dados.pagina_atual - 1) }}">Anterior</a>
                         </li>
-
-                        {# Indicador de Página #}
                         <li class="page-item disabled">
                             <span class="page-link">Página {{ dados.pagina_atual }} de {{ dados.total_paginas }}</span>
                         </li>
-
-                        {# Botão Próximo #}
                         <li class="page-item {{ 'disabled' if dados.pagina_atual == dados.total_paginas }}">
                             <a class="page-link"
                                 href="{{ url_for('rotas.analisar_dados', pagina=dados.pagina_atual + 1) }}">Próximo</a>
                         </li>
-
                     </ul>
                 </nav>
 
