@@ -12,8 +12,14 @@ rotas = Blueprint('rotas', __name__)
 
 @rotas.route('/')
 def home():
+    # O current_app.config['DIRETORIO_DADOS'] deve apontar para a sua pasta 'dados'
     pasta_dados = current_app.config['DIRETORIO_DADOS']
-    arquivos_no_servidor = [f for f in os.listdir(pasta_dados) if f != '.gitkeep']
+    
+    # Lista os arquivos, filtrando o .gitkeep
+    arquivos_no_servidor = []
+    if os.path.exists(pasta_dados):
+        arquivos_no_servidor = [f for f in os.listdir(pasta_dados) if f != '.gitkeep']
+    
     return render_template('analise_dataframes.html', arquivos_presentes=arquivos_no_servidor)
 
 

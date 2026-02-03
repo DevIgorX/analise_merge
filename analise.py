@@ -3,6 +3,8 @@ from datetime import datetime
 import os
 from utils import formatar_colunas
 
+from app.database import salvar_no_banco
+
 caminho_script = os.path.abspath(__file__)
 diretorio_raiz = os.path.dirname(caminho_script)
 caminho_dados = os.path.join(diretorio_raiz, 'dados')
@@ -137,12 +139,14 @@ for col in colunas_datas:
     if col in df_final_3.columns:
         df_final_3[col] = pd.to_datetime(df_final_3[col], errors='coerce').dt.strftime('%d/%m/%Y').fillna('Não informado')
 
+salvar_no_banco(df_final_3)
 
 data_hoje = datetime.today().strftime('%d-%m-%Y')
-nome_arquivo = f'{data_hoje}.xlsx'
+nome_arquivo = f'Analise_preventiva {data_hoje}.xlsx'
+caminho_saida = os.path.join(caminho_dados, nome_arquivo)
 
 with pd.ExcelWriter(
-    nome_arquivo,
+    caminho_saida,
     engine='xlsxwriter',
     datetime_format='dd/mm/yyyy'
 ) as writer:
@@ -153,6 +157,7 @@ with pd.ExcelWriter(
         index=False
     )
 
+print('processamento encerrou!')
 
-resultado_json = df_final_3.to_json(orient='records')
-print(resultado_json)
+# resultado_json = df_final_3.to_json(orient='records')
+# print(resultado_json)
