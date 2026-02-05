@@ -28,7 +28,7 @@ for arquivo in os.listdir(caminho_dados):
         df_mobile = pd.read_excel(caminho_arquivo)
         df_mobile = formatar_colunas(df_mobile)
         df_mobile = df_mobile.add_prefix('Mobile_')
-    elif 'Bipe_Produtos' in arquivo:
+    elif 'bipe_produtos' in arquivo:
         df_bipe = pd.read_excel(caminho_arquivo)
         df_bipe = formatar_colunas(df_bipe)
         df_bipe = df_bipe.add_prefix('Bipe_Prod_')
@@ -139,10 +139,11 @@ for col in colunas_datas:
 
 
 data_hoje = datetime.today().strftime('%d-%m-%Y')
-nome_arquivo = f'{data_hoje}.xlsx'
+nome_arquivo = f'Analise_preventiva {data_hoje}.xlsx'
+caminho_saida = os.path.join(caminho_dados, nome_arquivo)
 
 with pd.ExcelWriter(
-    nome_arquivo,
+    caminho_saida,
     engine='xlsxwriter',
     datetime_format='dd/mm/yyyy'
 ) as writer:
@@ -154,5 +155,5 @@ with pd.ExcelWriter(
     )
 
 
-resultado_json = df_final_3.to_json(orient='records')
-print(resultado_json)
+# resultado_json = df_final_3.to_json(orient='records')
+# print(resultado_json)

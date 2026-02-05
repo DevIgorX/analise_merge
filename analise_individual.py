@@ -22,7 +22,7 @@ for arquivo in os.listdir(caminho_dados):
         df_mobile = pd.read_excel(caminho_arquivo)
         df_mobile = formatar_colunas(df_mobile)
         df_mobile = df_mobile.add_prefix('Mobile_')
-    elif 'Bipe_Produtos' in arquivo:
+    elif 'bipe_produtos' in arquivo:
         df_bipe = pd.read_excel(caminho_arquivo)
         df_bipe = formatar_colunas(df_bipe)
         df_bipe = df_bipe.add_prefix('Bipe_Prod_')
