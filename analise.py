@@ -131,6 +131,7 @@ colunas_datas = [
     'Esl_Última Ocorrência/Data Ocorrência'
 ]
 
+df_final_3 = df_final_3.drop_duplicates(subset='Preventiva_Pedido 1P/Full', keep='first')
 
 for col in colunas_datas:
     
