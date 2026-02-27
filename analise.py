@@ -102,7 +102,7 @@ df_final_2 = (
         right_on='Esl_Nota Fiscal/Chave Nf-E', 
         how='left'
     )
-    .drop(columns=['Esl_Nota Fiscal/Chave Nf-E'])
+    
 )
 
 
@@ -115,11 +115,11 @@ df_final[coluna_obs] = df_final[coluna_obs].fillna('Não informado')
 # Merge final
 df_final_3 = pd.merge(
     df_final, 
-    df_final_2[['Carreta_Chave', coluna_ocorrencia]], 
+    df_final_2[['Esl_Nota Fiscal/Chave Nf-E', coluna_ocorrencia]], 
     left_on='Carreta_Chave', 
-    right_on='Carreta_Chave', 
+    right_on='Esl_Nota Fiscal/Chave Nf-E', 
     how='left'
-).drop(columns=['Carreta_Chave']) 
+).drop(columns=['Esl_Nota Fiscal/Chave Nf-E'])
 
 # Preenchimento condicional
 filtro = df_final_3[coluna_obs] == 'Não informado'
@@ -127,11 +127,17 @@ df_final_3.loc[filtro, coluna_obs] = df_final_3.loc[filtro, coluna_ocorrencia]
 
 df_final_3 = df_final_3.drop(columns=[coluna_ocorrencia])
 
+#movendo a coluna chave para o final da planilha
+coluna_chave = df_final_3.pop('Carreta_Chave')
+df_final_3['Chave_nf-e'] = coluna_chave
+
 # Formatação de datas (Nomes atualizados)
 colunas_datas = [
     'Carreta_Data Entrada',
     'Esl_Última Ocorrência/Data Ocorrência'
 ]
+
+
 
 df_final_3 = df_final_3.drop_duplicates(subset='Preventiva_Pedido 1P/Full', keep='first')
 
@@ -139,6 +145,7 @@ for col in colunas_datas:
     
     if col in df_final_3.columns:
         df_final_3[col] = pd.to_datetime(df_final_3[col], errors='coerce').dt.strftime('%d/%m/%Y').fillna('Não informado')
+
 
 salvar_no_banco(df_final_3)
 
