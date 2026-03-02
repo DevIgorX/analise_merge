@@ -10,14 +10,23 @@
 <body class="bg-light">
 
     <div class="container mt-5">
-        <div class="d-flex align-items-center justify-content-between mb-4">
-            <h2 class="mb-0">Resultado do Cruzamento dos dados</h2>
+        <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4">
 
-            <a href="{{ url_for('rotas.baixar_relatorio') }}"
-                class="btn btn-success d-flex align-items-center gap-2 shadow-sm">
-                <i class="bi bi-file-earmark-excel-fill"></i>
-                Exportar Excel
-            </a>
+            <h2 class="mb-0">Resultado da Integração de Dados</h2>
+        
+            <div class="d-flex gap-2">
+        
+                <a href="{{ url_for('rotas.deletar_arquivos') }}"
+                    class="btn btn-outline-primary shadow-sm">
+                    <i class="fas fa-arrow-left me-1"></i> Nova Análise
+                </a>
+        
+                <a href="{{ url_for('rotas.baixar_relatorio') }}"
+                    class="btn btn-success shadow-sm">
+                    <i class="fas fa-file-excel me-1"></i> Exportar Excel
+                </a>
+        
+            </div>
         </div>
 
         <div class="card shadow">

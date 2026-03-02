@@ -4,6 +4,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const listaArquivos = document.getElementById('file-list');
     const formAnalise = document.getElementById('form-analise');
     const loader = document.getElementById('loader-overlay');
+    const uploadArea = document.getElementById('arquivos').click()
 
     // 2. Mostrar nomes dos arquivos selecionados
     if (inputArquivos) {
@@ -31,4 +32,11 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     }
+
+    if (uploadArea && inputArquivos) {
+        uploadArea.addEventListener('click', function () {
+            inputArquivos.click();
+        });
+    }
+
 });
