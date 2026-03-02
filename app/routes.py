@@ -25,7 +25,7 @@ def home():
 
 @rotas.route('/adicionar_dados', methods=['POST'])
 def adicionar_dados():
-    arquivos = request.files.getlist('arquivos')
+    arquivos = request.files.getlist('arquivos') #está guardando aqui cada arquivo que foi enviado no input
     if not arquivos:
         flash("Nenhum arquivo enviado!", "danger")
         return redirect(url_for('rotas.home'))
@@ -34,7 +34,7 @@ def adicionar_dados():
     arquivos_pulados = []
 
     for arquivo in arquivos:
-        caminho_completo = os.path.join(pasta_dados, arquivo.filename)
+        caminho_completo = os.path.join(pasta_dados, arquivo.filename) 
         
         # VERIFICAÇÃO: Se o arquivo já existe, pula e avisa
         if os.path.exists(caminho_completo):
@@ -44,9 +44,9 @@ def adicionar_dados():
         arquivo.save(caminho_completo)
 
     if arquivos_pulados:
-        flash(f"Atenção! Os seguintes arquivos já estavam no servidor e foram ignorados: {', '.join(arquivos_pulados)}", "warning")
+        flash(f"Atenção! Os seguintes arquivos já estavam no servidor e foram ignorados: {', '.join(arquivos_pulados)}", "warning") # flash(mensagem, categoria)"warning" → cor amarelo (atenção)
     else:
-        flash("Arquivos enviados com sucesso!", "success")
+        flash("Arquivos enviados com sucesso!", "success") #success cor verde
 
     return redirect(url_for('rotas.home'))
 
@@ -100,5 +100,5 @@ def baixar_relatorio():
     nome_arquivo = f'Analise_preventiva {data_hoje}.xlsx'
 
 
-    return send_from_directory(pasta_dados, nome_arquivo, as_attachment=True)
+    return send_from_directory(pasta_dados, nome_arquivo, as_attachment=True) #serve para não abrir o arquivo no navegador, mas forçar o download.
     

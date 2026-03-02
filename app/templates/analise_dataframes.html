@@ -2,6 +2,14 @@
 
 {% block content %}
 
+
+<div id="loader-overlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.8); z-index: 9999; flex-direction: column; align-items: center; justify-content: center;">
+    <div class="text-center">
+        <i class="fas fa-spinner fa-spin fa-4x text-primary mb-3"></i>
+        <h4 class="text-dark">Processando dados...</h4>
+    </div>
+</div>
+
 <div class="container py-5">
     <div class="row justify-content-center">
         <div class="col-md-10 col-lg-7">
@@ -64,7 +72,7 @@
 
                     <hr class="my-4">
 
-                    <form method="GET" action="{{ url_for('rotas.analisar_dados') }}">
+                    <form id="form-analise" method="GET" action="{{ url_for('rotas.analisar_dados') }}">
                         <input type="hidden" name="processar" value="true">
                         <button type="submit" class="btn btn-analyze btn-action w-100 shadow-sm">
                             <i class="fas fa-microchip me-2"></i>Processar e Gerar Relatorio
@@ -92,7 +100,7 @@
     </div>
 </div>
 
-<script>
+<!-- <script>
     // Script simples para mostrar o nome dos arquivos selecionados
     document.getElementById('arquivos').addEventListener('change', function (e) {
         var files = e.target.files;
@@ -101,6 +109,6 @@
             list.innerHTML = files.length + " arquivo(s) selecionado(s)";
         }
     });
-</script>
+</script> -->
 
 {% endblock %}
