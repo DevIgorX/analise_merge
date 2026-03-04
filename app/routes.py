@@ -53,8 +53,8 @@ def adicionar_dados():
 
 @rotas.route('/analisar_dados')
 def analisar_dados():
-    pagina = request.args.get('pagina', 1, type=int)
-    processar = request.args.get('processar', 'false') == 'true'
+    pagina = request.args.get('pagina', 1, type=int) #procura na Url o paramentro chamado 'pagina', se não existir, use o valor padrao 1 e converta para inteiro
+    processar = request.args.get('processar', 'false') == 'true' #.get retorna uma string 'false' e logo em seguida e feita uma comparação de string 'false' é igual 'true'? não, então retorna o boleano False
 
     # Só roda o script de análise se o usuário clicou no botão pela primeira vez
     if processar:
